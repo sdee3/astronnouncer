@@ -43,6 +43,33 @@ export const planetsByType = {
 
 export const FLAG = SEFLG_SPEED | SEFLG_SWIEPH
 
+export type PlanetName =
+  | 'Sun'
+  | 'Moon'
+  | 'Mercury'
+  | 'Venus'
+  | 'Mars'
+  | 'Jupiter'
+  | 'Saturn'
+  | 'Uranus'
+  | 'Neptune'
+  | 'Pluto'
+
+export enum Sign {
+  'Aries' = 1,
+  'Taurus' = 2,
+  'Gemini' = 3,
+  'Cancer' = 4,
+  'Leo' = 5,
+  'Virgo' = 6,
+  'Libra' = 7,
+  'Scorpio' = 8,
+  'Sagittarius' = 9,
+  'Capricorn' = 10,
+  'Aquarius' = 11,
+  'Pisces' = 12
+}
+
 export interface Planets {
   sun: Planet
   moon: Planet
@@ -70,4 +97,9 @@ export interface Position {
   minutes: number
   seconds: number
   longitude: number
+}
+
+export interface PositionWithSign {
+  position: Position
+  sign: Sign
 }
