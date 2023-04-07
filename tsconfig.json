@@ -11,6 +11,9 @@
     "lib": ["ESNext"],
     "outDir": "./build"
   },
-  "include": ["."],
+  "ts-node": {
+    "files": true
+  },
+  "include": ["*"],
   "exclude": ["node_modules"]
 }

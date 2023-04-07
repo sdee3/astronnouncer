@@ -4,18 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsc"
+    "dev": "nodemon index.ts",
+    "start:prod": "pm2 start build/index.js --name=DiscordBot && pm2 save",
+    "stop:prod": "pm2 stop DiscordBot"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.9.0",
+    "dotenv": "^16.0.3",
+    "pm2": "^5.3.0",
     "sweph": "2.10.3-2"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
+    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.3"
   }
 }
