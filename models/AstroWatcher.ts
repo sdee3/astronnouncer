@@ -1,5 +1,13 @@
 import sweph from 'sweph'
-import { FLAG, PLANETS, Planets, planetsByType } from '../utils'
+import {
+  FLAG,
+  PLANETS,
+  PlanetName,
+  Planets,
+  Position,
+  Sign,
+  planetsByType
+} from '../utils'
 
 export class AstroWatcher {
   public utcToJulianUt = (utcDate: Date) => {
@@ -76,9 +84,12 @@ export class AstroWatcher {
     }
   }
 
-  public planets = (date: Date): Partial<Planets> => {
-    return Object.keys(PLANETS).reduce((accumulator, name) => {
+  public planets = (
+    date: Date
+  ): { names: PlanetName[]; positions: Position[]; signs: Sign[] } => {
+    const planetArr = Object.keys(PLANETS).reduce((accumulator, name) => {
       const planetPosition = this.position(name, date)
+
       accumulator[name] = {
         name,
         ...planetPosition,
@@ -86,6 +97,49 @@ export class AstroWatcher {
       }
 
       return accumulator
-    }, {})
+    }, {}) as Planets
+
+    const names = [
+      planetArr.sun!.name,
+      planetArr.moon!.name,
+      planetArr.mercury!.name,
+      planetArr.venus!.name,
+      planetArr.mars!.name,
+      planetArr.jupiter!.name,
+      planetArr.saturn!.name,
+      planetArr.uranus!.name,
+      planetArr.neptune!.name,
+      planetArr.pluto!.name
+    ].map(
+      (name) => (name?.charAt(0).toUpperCase() + name?.slice(1)) as PlanetName
+    )
+
+    const positions = [
+      planetArr.sun!.position,
+      planetArr.moon!.position,
+      planetArr.mercury!.position,
+      planetArr.venus!.position,
+      planetArr.mars!.position,
+      planetArr.jupiter!.position,
+      planetArr.saturn!.position,
+      planetArr.uranus!.position,
+      planetArr.neptune!.position,
+      planetArr.pluto!.position
+    ]
+
+    const signs = [
+      Sign[planetArr.sun!.sign],
+      Sign[planetArr.moon!.sign],
+      Sign[planetArr.mercury!.sign],
+      Sign[planetArr.venus!.sign],
+      Sign[planetArr.mars!.sign],
+      Sign[planetArr.jupiter!.sign],
+      Sign[planetArr.saturn!.sign],
+      Sign[planetArr.uranus!.sign],
+      Sign[planetArr.neptune!.sign],
+      Sign[planetArr.pluto!.sign]
+    ] as unknown as Sign[]
+
+    return { names, positions, signs }
   }
 }

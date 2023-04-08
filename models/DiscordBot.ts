@@ -47,61 +47,47 @@ export class DiscordBot {
 
   private fetchPlanetaryPositions = (channel: TextChannel) => {
     const interval = setInterval(async () => {
-      const planets = this.astroWatcher.planets(new Date())
+      const { positions, names, signs } = this.astroWatcher.planets(new Date())
+      let previousSize = this.previousPlanetPositions.size
 
-      const names = [
-        planets.sun!.name,
-        planets.moon!.name,
-        planets.mercury!.name,
-        planets.venus!.name,
-        planets.mars!.name,
-        planets.jupiter!.name,
-        planets.saturn!.name,
-        planets.uranus!.name,
-        planets.neptune!.name,
-        planets.pluto!.name
-      ].map(
-        (name) => name?.charAt(0).toUpperCase() + name?.slice(1)
-      ) as PlanetName[]
+      positions.forEach(async (position, index) => {
+        const previousPosition = this.previousPlanetPositions.get(names[index])
 
-      const positions = [
-        planets.sun!.position,
-        planets.moon!.position,
-        planets.mercury!.position,
-        planets.venus!.position,
-        planets.mars!.position,
-        planets.jupiter!.position,
-        planets.saturn!.position,
-        planets.uranus!.position,
-        planets.neptune!.position,
-        planets.pluto!.position
-      ]
+        if (
+          previousPosition?.position.degrees === position.degrees &&
+          previousPosition?.position.minutes === position.minutes &&
+          previousPosition?.sign === signs[index] &&
+          this.previousPlanetPositions.size > 0
+        ) {
+          // The previous and current value is the same, so we don't need to send a message
+          return
+        }
 
-      const signs = [
-        Sign[planets.sun!.sign],
-        Sign[planets.moon!.sign],
-        Sign[planets.mercury!.sign],
-        Sign[planets.venus!.sign],
-        Sign[planets.mars!.sign],
-        Sign[planets.jupiter!.sign],
-        Sign[planets.saturn!.sign],
-        Sign[planets.uranus!.sign],
-        Sign[planets.neptune!.sign],
-        Sign[planets.pluto!.sign]
-      ]
-
-      positions.forEach((_, index) =>
         this.previousPlanetPositions.set(names[index], {
           position: positions[index],
           sign: signs[index] as unknown as Sign
         })
-      )
 
-      names.forEach((name) =>
-        console.log(this.getFormattedMessageForPlanet(name))
-      )
+        if (previousSize === 0) {
+          // We don't want to send a message on the first run
+          return
+        }
 
-      // channel.send('HI!')
+        if (
+          position.degrees === 0 &&
+          position.minutes === 0 &&
+          previousPosition?.position.degrees !== 0 &&
+          previousPosition?.position.minutes !== 0
+        ) {
+          // The planet has changed signs, so we send a message
+          const name = names[index]
+          const message = this.getFormattedMessageForPlanet(name)
+
+          if (!message) return
+
+          await channel.send(message as string)
+        }
+      })
     }, ASTRO_CHECK_INTERVAL)
 
     return interval
