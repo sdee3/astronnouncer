@@ -93,6 +93,9 @@ export class DiscordBot {
     return interval
   }
 
+  /**
+   * Retrieves a message for the Discord channel saying that a planet changed signs.
+   */
   private getFormattedMessageForPlanet = (
     planetName: PlanetName
   ): string | null => {
@@ -100,8 +103,8 @@ export class DiscordBot {
 
     if (!planetData) return null
 
-    const { position, sign } = planetData
+    const { sign } = planetData
 
-    return `${planetName} is at ${position.degrees}°${position.minutes}' ${sign}`
+    return `${planetName} entered ${sign}!`
   }
 }
