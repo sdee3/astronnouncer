@@ -59,7 +59,7 @@ class AstroWatcher {
         };
     };
     planets = (date) => {
-        return Object.keys(utils_1.PLANETS).reduce((accumulator, name) => {
+        const planetArr = Object.keys(utils_1.PLANETS).reduce((accumulator, name) => {
             const planetPosition = this.position(name, date);
             accumulator[name] = {
                 name,
@@ -68,6 +68,43 @@ class AstroWatcher {
             };
             return accumulator;
         }, {});
+        const names = [
+            planetArr.sun.name,
+            planetArr.moon.name,
+            planetArr.mercury.name,
+            planetArr.venus.name,
+            planetArr.mars.name,
+            planetArr.jupiter.name,
+            planetArr.saturn.name,
+            planetArr.uranus.name,
+            planetArr.neptune.name,
+            planetArr.pluto.name
+        ].map((name) => (name?.charAt(0).toUpperCase() + name?.slice(1)));
+        const positions = [
+            planetArr.sun.position,
+            planetArr.moon.position,
+            planetArr.mercury.position,
+            planetArr.venus.position,
+            planetArr.mars.position,
+            planetArr.jupiter.position,
+            planetArr.saturn.position,
+            planetArr.uranus.position,
+            planetArr.neptune.position,
+            planetArr.pluto.position
+        ];
+        const signs = [
+            utils_1.Sign[planetArr.sun.sign],
+            utils_1.Sign[planetArr.moon.sign],
+            utils_1.Sign[planetArr.mercury.sign],
+            utils_1.Sign[planetArr.venus.sign],
+            utils_1.Sign[planetArr.mars.sign],
+            utils_1.Sign[planetArr.jupiter.sign],
+            utils_1.Sign[planetArr.saturn.sign],
+            utils_1.Sign[planetArr.uranus.sign],
+            utils_1.Sign[planetArr.neptune.sign],
+            utils_1.Sign[planetArr.pluto.sign]
+        ];
+        return { names, positions, signs };
     };
 }
 exports.AstroWatcher = AstroWatcher;

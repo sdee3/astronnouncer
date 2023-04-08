@@ -79,7 +79,7 @@ describe('DiscordBot', () => {
 
     // Expect message to have been sent to the channel
     expect(mockChannelSend).toHaveBeenCalledWith(
-      `${planetName} is at ${positions[0].degrees}°${positions[0].minutes}' ${sign}`
+      `${planetName} entered ${sign}!`
     )
   })
 
