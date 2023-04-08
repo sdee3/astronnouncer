@@ -24,12 +24,16 @@ export class DiscordBot {
         return
       }
 
+      await (channel as TextChannel).send(
+        'Hello, I am Astronnouncer! I will notify you as soon as a planet changes signs!'
+      )
+
       this.messageInterval = this.fetchPlanetaryPositions(
         channel as TextChannel
       )
     })
 
-    process.on('exit', () => this.clearInterval())
+    process.on('exit', this.clearInterval)
 
     client.on(Events.ChannelDelete, () => this.clearInterval())
 
