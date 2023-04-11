@@ -1,6 +1,6 @@
 {
   "name": "astronnouncer",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "A simple Discord bot that announces planetary movements based on the Swiss Ephemeris.",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "stop:prod": "pm2 stop DiscordBot"
   },
   "keywords": [],
-  "author": "",
+  "author": "Stefan Djokic (stefd996@gmail.com)",
   "license": "ISC",
   "dependencies": {
     "dayjs": "^1.11.7",
