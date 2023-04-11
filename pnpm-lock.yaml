@@ -1,6 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  dayjs:
+    specifier: ^1.11.7
+    version: 1.11.7
   discord.js:
     specifier: ^14.9.0
     version: 14.9.0

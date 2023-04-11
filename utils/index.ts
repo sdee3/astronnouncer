@@ -15,7 +15,7 @@ export const {
   SEFLG_SWIEPH
 } = constants
 
-export const PLANETS: any = {
+export const PLANETS = {
   sun: SE_SUN,
   moon: SE_MOON,
   mercury: SE_MERCURY,
@@ -102,4 +102,25 @@ export interface Position {
 export interface PositionWithSign {
   position: Position
   sign: Sign
+}
+
+export type Aspect =
+  | 'conjunction'
+  | 'opposition'
+  | 'square'
+  | 'trine'
+  | 'sextile'
+  | 'quincunx'
+  | 'semisextile'
+
+export interface AspectOccurrence {
+  planetName1: PlanetName
+  planetName2: PlanetName
+  aspect: Aspect
+  degree1: number
+  degree2: number
+  sign1: Sign
+  sign2: Sign
+  /** A DD-MM-YYYY timestamp */
+  date: string
 }

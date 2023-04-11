@@ -5,11 +5,14 @@ import {
   PlanetName,
   Planets,
   Position,
+  PositionWithSign,
   Sign,
   planetsByType
 } from '../utils'
 
 export class AstroWatcher {
+  private previousPlanetPositions: Map<PlanetName, PositionWithSign> = new Map()
+
   public utcToJulianUt = (utcDate: Date) => {
     const milliSecondsInSeconds = utcDate.getUTCMilliseconds() / 1000
     const secondsInMinutes =
@@ -60,12 +63,14 @@ export class AstroWatcher {
     return degrees
   }
 
-  public getPositionOfAstro = (astro: string, julianDay: number) =>
-    sweph.calc(julianDay, PLANETS[astro], FLAG)
+  public getPositionOfAstro = (
+    astro: keyof typeof PLANETS,
+    julianDay: number
+  ) => sweph.calc(julianDay, PLANETS[astro], FLAG)
 
   public isRetrograde = (speed: number) => speed < 0
 
-  public position = (astrologyObject: string, moment: Date) => {
+  public position = (astrologyObject: keyof typeof PLANETS, moment: Date) => {
     const julianDay = this.utcToJulianEt(moment)
     const { data } = this.getPositionOfAstro(astrologyObject, julianDay)
     const longitude = data[0]
@@ -88,7 +93,7 @@ export class AstroWatcher {
     date: Date
   ): { names: PlanetName[]; positions: Position[]; signs: Sign[] } => {
     const planetArr = Object.keys(PLANETS).reduce((accumulator, name) => {
-      const planetPosition = this.position(name, date)
+      const planetPosition = this.position(name as keyof typeof PLANETS, date)
 
       accumulator[name] = {
         name,
@@ -128,18 +133,65 @@ export class AstroWatcher {
     ]
 
     const signs = [
-      Sign[planetArr.sun!.sign],
-      Sign[planetArr.moon!.sign],
-      Sign[planetArr.mercury!.sign],
-      Sign[planetArr.venus!.sign],
-      Sign[planetArr.mars!.sign],
-      Sign[planetArr.jupiter!.sign],
-      Sign[planetArr.saturn!.sign],
-      Sign[planetArr.uranus!.sign],
-      Sign[planetArr.neptune!.sign],
-      Sign[planetArr.pluto!.sign]
-    ] as unknown as Sign[]
+      planetArr.sun!.sign,
+      planetArr.moon!.sign,
+      planetArr.mercury!.sign,
+      planetArr.venus!.sign,
+      planetArr.mars!.sign,
+      planetArr.jupiter!.sign,
+      planetArr.saturn!.sign,
+      planetArr.uranus!.sign,
+      planetArr.neptune!.sign,
+      planetArr.pluto!.sign
+    ] as Sign[]
 
     return { names, positions, signs }
+  }
+
+  public getPlanetsWithChangedSigns = ():
+    | { name: PlanetName; sign: Sign }[]
+    | [] => {
+    const { positions, names, signs } = this.planets(new Date())
+
+    let previousSize = this.previousPlanetPositions.size
+    let changedPlanets: { name: PlanetName; sign: Sign }[] = []
+
+    positions.forEach(async (position, index) => {
+      const previousPosition = this.previousPlanetPositions.get(names[index])
+
+      if (
+        previousPosition?.position.degrees === position.degrees &&
+        previousPosition?.position.minutes === position.minutes &&
+        previousPosition?.sign === signs[index] &&
+        this.previousPlanetPositions.size > 0
+      ) {
+        // The previous and current value is the same, so we don't need to send a message
+        return
+      }
+
+      this.previousPlanetPositions.set(names[index], {
+        position: positions[index],
+        sign: signs[index] as unknown as Sign
+      })
+
+      if (previousSize === 0) {
+        // We don't want to send a message on the first run
+        return
+      }
+
+      if (
+        position.degrees === 0 &&
+        position.minutes === 0 &&
+        previousPosition?.position.degrees !== 0 &&
+        previousPosition?.position.minutes !== 0
+      ) {
+        // The planet has changed signs, so we return it
+        const name = names[index]
+
+        changedPlanets.push({ name, sign: signs[index] })
+      }
+    })
+
+    return changedPlanets
   }
 }
