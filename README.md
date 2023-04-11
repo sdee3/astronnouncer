@@ -24,8 +24,3 @@ GENERAL_CHANNEL_ID="GENERAL_CHANNEL_ID"
 ```
 
 Run `pnpm start:prod` to launch a `pm2` instance that monitors the production Node build in the background.
-
-## Unit tests
-
-Run `pnpm test`. 
-Any `*.spec.ts` file will automatically get tested by Jest.
