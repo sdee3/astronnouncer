@@ -75,7 +75,27 @@ export class DiscordBot {
     sign2: Sign,
     aspect: Aspect
   ): string | null => {
-    return `${planetName} in ${Sign[sign]} is making a ${aspect} to ${planetName2} in ${Sign[sign2]}!`
+    if (aspect === 'conjunction' && planetName === 'Sun') {
+      return `${planetName2} Cazimi!`
+    }
+
+    if (
+      aspect === 'conjunction' &&
+      planetName === 'Sun' &&
+      planetName2 === 'Moon'
+    ) {
+      return `New Moon in ${Sign[sign]}!`
+    }
+
+    if (
+      aspect === 'opposition' &&
+      planetName === 'Sun' &&
+      planetName2 === 'Moon'
+    ) {
+      return `Full Moon in ${Sign[sign]}!`
+    }
+
+    return `${planetName} in ${Sign[sign]} is making a(n) ${aspect} to ${planetName2} in ${Sign[sign2]}!`
   }
 
   private parsePlanetPositions = async (channel: TextChannel) => {

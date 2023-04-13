@@ -84,10 +84,12 @@ export class AspectChecker {
 
         if (planetName === planetName2) return
 
-        const calculatedDegreeDiff = this.astroWatcher.normalizeDegrees(
-          position.degrees +
-            signs[index] * 30 -
-            (position2.degrees + signs[index2] * 30)
+        const calculatedDegreeDiff = Math.abs(
+          this.astroWatcher.normalizeDegrees(
+            position.degrees +
+              signs[index] * 30 -
+              (position2.degrees + signs[index2] * 30)
+          )
         )
 
         const minuteDiff = position.minutes - position2.minutes
@@ -151,14 +153,16 @@ export class AspectChecker {
           aspectOccurrence.planetName1 === planetName2 ||
           aspectOccurrence.planetName2 === planetName1 ||
           aspectOccurrence.planetName2 === planetName2) &&
-        aspectOccurrence.sign1 === sign1 &&
-        aspectOccurrence.sign2 === sign2 &&
+        (aspectOccurrence.sign1 === sign1 ||
+          aspectOccurrence.sign1 === sign2 ||
+          aspectOccurrence.sign2 === sign1 ||
+          aspectOccurrence.sign2 === sign2) &&
         aspectOccurrence.degree1 === degree1 &&
         aspectOccurrence.degree2 === degree2 &&
         aspectOccurrence.aspect === aspect &&
         aspectOccurrence.date === today
     )
 
-    return !!aspectOccurred
+    return !!aspectOccurred || planetName2 === 'Moon'
   }
 }
