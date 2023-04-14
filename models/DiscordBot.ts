@@ -95,7 +95,11 @@ export class DiscordBot {
       return `Full Moon in ${Sign[sign]}!`
     }
 
-    return `${planetName} in ${Sign[sign]} is making a(n) ${aspect} to ${planetName2} in ${Sign[sign2]}!`
+    if (aspect === 'opposition') {
+      return `${planetName} in ${Sign[sign]} is making an ${aspect} to ${planetName2} in ${Sign[sign2]}!`
+    }
+
+    return `${planetName} in ${Sign[sign]} is making a ${aspect} to ${planetName2} in ${Sign[sign2]}!`
   }
 
   private parsePlanetPositions = async (channel: TextChannel) => {
