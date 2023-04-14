@@ -10,9 +10,9 @@ Since v1.1.1, detecting major aspects (conjunctions, sextiles, squares, trines, 
 
 Don't be shy! Feel free to [submit them publicly on my GitHub repo](https://github.com/sdee3/astronnouncer/issues/new)!
 
-### Features coming up
+### Upcoming features
 
-/
+1. Announcing Retrogrades, planets entering and leaving shadow, Mercury / Venus retrograde cazimis.
 
 ## Production environment setup
 
