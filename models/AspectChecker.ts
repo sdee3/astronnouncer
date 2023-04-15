@@ -12,7 +12,7 @@ export class AspectChecker {
 
   private aspectsOccurred: AspectOccurrence[] = []
 
-  public checkForConjunction = (channel: TextChannel) => {
+  public checkForConjunction = () => {
     const { positions, names, signs } = this.astroWatcher.planets(new Date())
 
     positions.forEach(async (position, index) => {
@@ -63,17 +63,13 @@ export class AspectChecker {
             date: dayjs().format('DD-MM-YYYY')
           })
 
-          await channel.send(message as string)
+          await this.discordBot.sendMessageToChannels(message as string)
         }
       })
     })
   }
 
-  public checkForAspect = async (
-    channel: TextChannel,
-    aspect: Aspect,
-    degreeDiff: number
-  ) => {
+  public checkForAspect = async (aspect: Aspect, degreeDiff: number) => {
     const { positions, names, signs } = this.astroWatcher.planets(new Date())
 
     positions.forEach(async (position, index) => {
@@ -130,7 +126,7 @@ export class AspectChecker {
             date: dayjs().format('DD-MM-YYYY')
           })
 
-          await channel.send(message as string)
+          await this.discordBot.sendMessageToChannels(message as string)
         }
       })
     })
