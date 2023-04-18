@@ -92,6 +92,13 @@ export interface Planet {
   type: string
 }
 
+export interface PlanetData {
+  names: PlanetName[]
+  positions: Position[]
+  signs: Sign[]
+  retrogrades: boolean[]
+}
+
 export interface Position {
   degrees: number
   minutes: number
@@ -115,12 +122,12 @@ export type Aspect =
 
 export interface AspectOccurrence {
   planetName1: PlanetName
-  planetName2: PlanetName
-  aspect: Aspect
+  planetName2?: PlanetName
+  aspect?: Aspect
   degree1: number
-  degree2: number
+  degree2?: number
   sign1: Sign
-  sign2: Sign
+  sign2?: Sign
   /** A DD-MM-YYYY timestamp */
   date: string
 }

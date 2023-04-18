@@ -132,6 +132,54 @@ export class AspectChecker {
     })
   }
 
+  // TODO:
+  public checkForRetrograde = async () => {
+    const { retrogrades, names, positions, signs } = this.astroWatcher.planets(
+      new Date()
+    )
+
+    retrogrades.forEach(async (retrograde, index) => {
+      const planetName = names[index]
+
+      if (retrograde) {
+        const message = this.discordBot.getFormattedMessageForRetrograde(
+          planetName,
+          signs[index]
+        )
+
+        if (!message) {
+          return
+        }
+
+        if (this.hasAnnouncedRetrograde(planetName, signs[index])) {
+          return
+        }
+
+        this.aspectsOccurred.push({
+          planetName1: planetName,
+          sign1: signs[index],
+          degree1: positions[index].degrees,
+          date: dayjs().format('DD-MM-YYYY')
+        })
+
+        await this.discordBot.sendMessageToChannels(message as string)
+      }
+    })
+  }
+
+  private hasAnnouncedRetrograde = (planetName: PlanetName, sign: Sign) => {
+    const today = dayjs().format('DD-MM-YYYY')
+
+    const retrogradeOccurred = this.aspectsOccurred.find(
+      (aspectOccurrence) =>
+        aspectOccurrence.planetName1 === planetName &&
+        aspectOccurrence.sign1 === sign &&
+        aspectOccurrence.date === today
+    )
+
+    return !!retrogradeOccurred
+  }
+
   private hasAnnouncedAspect = (
     planetName1: PlanetName,
     planetName2: PlanetName,

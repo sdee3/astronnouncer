@@ -2,9 +2,9 @@ import sweph from 'sweph'
 import {
   FLAG,
   PLANETS,
+  PlanetData,
   PlanetName,
   Planets,
-  Position,
   PositionWithSign,
   Sign,
   planetsByType
@@ -89,9 +89,7 @@ export class AstroWatcher {
     }
   }
 
-  public planets = (
-    date: Date
-  ): { names: PlanetName[]; positions: Position[]; signs: Sign[] } => {
+  public planets = (date: Date): PlanetData => {
     const planetArr = Object.keys(PLANETS).reduce((accumulator, name) => {
       const planetPosition = this.position(name as keyof typeof PLANETS, date)
 
@@ -145,7 +143,20 @@ export class AstroWatcher {
       planetArr.pluto!.sign
     ] as Sign[]
 
-    return { names, positions, signs }
+    const retrogrades = [
+      this.isRetrograde(planetArr.sun!.speed),
+      this.isRetrograde(planetArr.moon!.speed),
+      this.isRetrograde(planetArr.mercury!.speed),
+      this.isRetrograde(planetArr.venus!.speed),
+      this.isRetrograde(planetArr.mars!.speed),
+      this.isRetrograde(planetArr.jupiter!.speed),
+      this.isRetrograde(planetArr.saturn!.speed),
+      this.isRetrograde(planetArr.uranus!.speed),
+      this.isRetrograde(planetArr.neptune!.speed),
+      this.isRetrograde(planetArr.pluto!.speed)
+    ]
+
+    return { names, positions, signs, retrogrades }
   }
 
   public getPlanetsWithChangedSigns = ():

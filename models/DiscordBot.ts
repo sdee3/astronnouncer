@@ -106,6 +106,7 @@ export class DiscordBot {
     await aspectChecker.checkForAspect('square', 90)
     await aspectChecker.checkForAspect('trine', 120)
     await aspectChecker.checkForAspect('opposition', 180)
+    // await aspectChecker.checkForRetrograde()
   }
 
   private populateChannelList = async (guild: Guild) => {
@@ -160,6 +161,20 @@ export class DiscordBot {
     sign: Sign
   ): string | null => {
     return `${planetName} has entered ${Sign[sign]}!`
+  }
+
+  public getFormattedMessageForRetrograde = (
+    planetName: PlanetName,
+    sign: Sign
+  ): string | null => {
+    return `${planetName} has entered retrograde in ${Sign[sign]}!`
+  }
+
+  public getFormattedMessageForRetrogradeEnd = (
+    planetName: PlanetName,
+    sign: Sign
+  ): string | null => {
+    return `${planetName} has ended its retrograde in ${Sign[sign]}!`
   }
 
   public getFormattedMessageForAspect = (
