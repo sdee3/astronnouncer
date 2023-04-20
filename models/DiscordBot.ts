@@ -171,7 +171,9 @@ export class DiscordBot {
   ): string | null => {
     if (
       aspect === 'conjunction' &&
-      (planetName === 'Sun' || planetName2 === 'Sun')
+      (planetName === 'Sun' || planetName2 === 'Sun') &&
+      planetName !== 'Moon' &&
+      planetName2 !== 'Moon'
     ) {
       return `${planetName2} Cazimi!`
     }
