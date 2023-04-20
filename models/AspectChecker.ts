@@ -141,6 +141,7 @@ export class AspectChecker {
     aspect: Aspect
   ) => {
     const today = dayjs().format('DD-MM-YYYY')
+    const yesterday = dayjs().subtract(1, 'day').format('DD-MM-YYYY')
 
     const aspectOccurred = this.aspectsOccurred.find(
       (aspectOccurrence) =>
@@ -155,7 +156,7 @@ export class AspectChecker {
         aspectOccurrence.degree1 === degree1 &&
         aspectOccurrence.degree2 === degree2 &&
         aspectOccurrence.aspect === aspect &&
-        aspectOccurrence.date === today
+        (aspectOccurrence.date === today || aspectOccurrence.date === yesterday)
     )
 
     return !!aspectOccurred || planetName2 === 'Moon'
