@@ -169,22 +169,25 @@ export class DiscordBot {
     sign2: Sign,
     aspect: Aspect
   ): string | null => {
-    if (aspect === 'conjunction' && planetName === 'Sun') {
+    if (
+      aspect === 'conjunction' &&
+      (planetName === 'Sun' || planetName2 === 'Sun')
+    ) {
       return `${planetName2} Cazimi!`
     }
 
     if (
       aspect === 'conjunction' &&
-      planetName === 'Sun' &&
-      planetName2 === 'Moon'
+      planetName === 'Moon' &&
+      planetName2 === 'Sun'
     ) {
       return `New Moon in ${Sign[sign]}!`
     }
 
     if (
       aspect === 'opposition' &&
-      planetName === 'Sun' &&
-      planetName2 === 'Moon'
+      planetName === 'Moon' &&
+      planetName2 === 'Sun'
     ) {
       return `Full Moon in ${Sign[sign]}!`
     }

@@ -1,6 +1,6 @@
 {
   "name": "astronnouncer",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A simple Discord bot that announces planetary movements based on the Swiss Ephemeris.",
   "main": "index.js",
   "scripts": {

@@ -1,5 +1,4 @@
 import { AstroWatcher } from './AstroWatcher'
-import { TextChannel } from 'discord.js'
 import { DiscordBot } from './DiscordBot'
 import { Aspect, AspectOccurrence, PlanetName, Sign } from '../utils'
 import dayjs from 'dayjs'
