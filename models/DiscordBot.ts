@@ -9,6 +9,7 @@ import { AstroWatcher } from './AstroWatcher'
 import { AspectChecker } from './AspectChecker'
 import {
   ASTRO_CHECK_INTERVAL,
+  CHANNEL_CHECK_INTERVAL,
   DISCORD_BOT_TOKEN,
   MY_GENERAL_CHANNEL_ID,
   MY_TEST_CHANNEL_ID
@@ -17,6 +18,8 @@ import { Aspect, PlanetName, Sign } from '../utils'
 
 export class DiscordBot {
   private messageInterval: NodeJS.Timer | null = null
+
+  private fetchChannelsInterval: NodeJS.Timer | null = null
 
   private channelList: string[] = []
 
@@ -56,8 +59,13 @@ export class DiscordBot {
     this.client.on(Events.ClientReady, async (client) => {
       console.info('Bot is ready!')
 
+      this.fetchChannelsInterval = setInterval(
+        async () => await this.fetchChannels(),
+        CHANNEL_CHECK_INTERVAL
+      )
+
       this.messageInterval = setInterval(
-        async () => await this.fetchChannelsAndStartEmit(aspectChecker),
+        async () => await this.checkPlanets(aspectChecker),
         ASTRO_CHECK_INTERVAL
       )
     })
@@ -93,13 +101,15 @@ export class DiscordBot {
     })
   }
 
-  private fetchChannelsAndStartEmit = async (aspectChecker: AspectChecker) => {
+  private fetchChannels = async () => {
     if (!this.client) return
 
     const guilds = this.client.guilds.cache
 
     guilds.forEach((guild) => this.populateChannelList(guild))
+  }
 
+  private checkPlanets = async (aspectChecker: AspectChecker) => {
     this.parsePlanetPositions()
     aspectChecker.checkForConjunction()
     await aspectChecker.checkForAspect('sextile', 60)
@@ -152,6 +162,11 @@ export class DiscordBot {
     if (this.messageInterval !== null) {
       clearInterval(this.messageInterval)
       this.messageInterval = null
+    }
+
+    if (this.fetchChannelsInterval !== null) {
+      clearInterval(this.fetchChannelsInterval)
+      this.fetchChannelsInterval = null
     }
   }
 
