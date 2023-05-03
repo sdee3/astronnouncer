@@ -190,7 +190,7 @@ export class DiscordBot {
       planetName !== 'Moon' &&
       planetName2 !== 'Moon'
     ) {
-      return `${planetName2} Cazimi!`
+      return `${planetName2} Cazimi in ${sign}!`
     }
 
     if (
@@ -207,6 +207,14 @@ export class DiscordBot {
       planetName2 === 'Sun'
     ) {
       return `Full Moon in ${Sign[sign]}!`
+    }
+
+    if (
+      planetName === 'Moon' &&
+      planetName2 === 'Sun' &&
+      (aspect === 'sextile' || aspect === 'square' || aspect === 'trine')
+    ) {
+      return null
     }
 
     if (aspect === 'opposition') {
