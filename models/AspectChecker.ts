@@ -1,6 +1,12 @@
 import { AstroWatcher } from './AstroWatcher'
 import { DiscordBot } from './DiscordBot'
-import { Aspect, AspectOccurrence, PlanetName, Sign } from '../utils'
+import {
+  Aspect,
+  AspectOccurrence,
+  RetrogradeOccurrence,
+  PlanetName,
+  Sign
+} from '../utils'
 import dayjs from 'dayjs'
 
 export class AspectChecker {
@@ -10,8 +16,9 @@ export class AspectChecker {
   ) {}
 
   private aspectsOccurred: AspectOccurrence[] = []
+  private retrogradesOccurred: RetrogradeOccurrence[] = []
 
-  public checkForConjunction = () => {
+  public checkForConjunction = async () => {
     const { positions, names, signs } = this.astroWatcher.planets(new Date())
 
     positions.forEach(async (position, index) => {
@@ -65,6 +72,39 @@ export class AspectChecker {
           await this.discordBot.sendMessageToChannels(message as string)
         }
       })
+    })
+  }
+
+  public checkForRetrograde = async () => {
+    const { retrogrades, names, signs } = this.astroWatcher.planets(new Date())
+
+    retrogrades.forEach(async (retrograde, index) => {
+      const planetName = names[index]
+      const sign = signs[index]
+
+      const message = this.discordBot.getFormattedMessageForRetrograde(
+        planetName,
+        sign,
+        retrograde
+      )
+
+      if (this.hasNoRetrogradeInformation(planetName)) {
+        this.retrogradesOccurred.push({
+          planetName,
+          startedRetrograde: retrograde
+        })
+
+        return
+      }
+
+      if (this.hasAnnouncedRetrograde(planetName, retrograde)) return
+
+      this.retrogradesOccurred.push({
+        planetName,
+        startedRetrograde: retrograde
+      })
+
+      await this.discordBot.sendMessageToChannels(message as string)
     })
   }
 
@@ -160,5 +200,27 @@ export class AspectChecker {
     )
 
     return !!aspectOccurred || planetName2 === 'Moon'
+  }
+
+  private hasAnnouncedRetrograde = (
+    planetName: PlanetName,
+    isRetrograde: boolean
+  ) => {
+    const retrogradeOccurred = this.retrogradesOccurred.find(
+      (retrogradeOccurrence) => {
+        return (
+          retrogradeOccurrence.planetName === planetName &&
+          retrogradeOccurrence.startedRetrograde === isRetrograde
+        )
+      }
+    )
+
+    return !!retrogradeOccurred || planetName === 'Sun' || planetName === 'Moon'
+  }
+
+  private hasNoRetrogradeInformation = (planetName: PlanetName) => {
+    return !this.retrogradesOccurred.find(
+      (retrogradeOccurrence) => retrogradeOccurrence.planetName === planetName
+    )
   }
 }

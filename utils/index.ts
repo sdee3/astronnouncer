@@ -1,5 +1,7 @@
 import { constants } from 'sweph'
 
+export type Environment = 'development' | 'production'
+
 export const {
   SE_SUN,
   SE_MOON,
@@ -71,19 +73,19 @@ export enum Sign {
 }
 
 export interface Planets {
-  sun: Planet
-  moon: Planet
-  mercury: Planet
-  venus: Planet
-  mars: Planet
-  jupiter: Planet
-  saturn: Planet
-  uranus: Planet
-  neptune: Planet
-  pluto: Planet
+  sun: PlanetData
+  moon: PlanetData
+  mercury: PlanetData
+  venus: PlanetData
+  mars: PlanetData
+  jupiter: PlanetData
+  saturn: PlanetData
+  uranus: PlanetData
+  neptune: PlanetData
+  pluto: PlanetData
 }
 
-export interface Planet {
+export interface PlanetData {
   name: string
   position: Position
   speed: number
@@ -123,4 +125,16 @@ export interface AspectOccurrence {
   sign2: Sign
   /** A DD-MM-YYYY timestamp */
   date: string
+}
+
+export interface RetrogradeOccurrence {
+  planetName: PlanetName
+  startedRetrograde: boolean
+}
+
+export interface PlanetDataByDate {
+  names: PlanetName[]
+  positions: Position[]
+  signs: Sign[]
+  retrogrades: boolean[]
 }

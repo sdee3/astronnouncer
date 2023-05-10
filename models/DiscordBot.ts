@@ -12,7 +12,8 @@ import {
   CHANNEL_CHECK_INTERVAL,
   DISCORD_BOT_TOKEN,
   MY_GENERAL_CHANNEL_ID,
-  MY_TEST_CHANNEL_ID
+  MY_TEST_CHANNEL_ID,
+  NODE_ENV
 } from '../config'
 import { Aspect, PlanetName, Sign } from '../utils'
 
@@ -56,7 +57,7 @@ export class DiscordBot {
       this.channelList = this.channelList.filter((c) => c !== generalChannelId)
     })
 
-    this.client.on(Events.ClientReady, async (client) => {
+    this.client.on(Events.ClientReady, async () => {
       console.info('Bot is ready!')
 
       this.fetchChannelsInterval = setInterval(
@@ -104,6 +105,18 @@ export class DiscordBot {
   private fetchChannels = async () => {
     if (!this.client) return
 
+    if (NODE_ENV === 'development') {
+      if (!this.channelList.includes(MY_TEST_CHANNEL_ID)) {
+        console.log("[DEV ENV] Connecting only to Stefan's test channel...")
+
+        this.channelList.push(MY_TEST_CHANNEL_ID)
+
+        return
+      }
+
+      return
+    }
+
     const guilds = this.client.guilds.cache
 
     guilds.forEach((guild) => this.populateChannelList(guild))
@@ -111,7 +124,8 @@ export class DiscordBot {
 
   private checkPlanets = async (aspectChecker: AspectChecker) => {
     this.parsePlanetPositions()
-    aspectChecker.checkForConjunction()
+    await aspectChecker.checkForConjunction()
+    await aspectChecker.checkForRetrograde()
     await aspectChecker.checkForAspect('sextile', 60)
     await aspectChecker.checkForAspect('square', 90)
     await aspectChecker.checkForAspect('trine', 120)
@@ -173,8 +187,18 @@ export class DiscordBot {
   public getFormattedMessageForPlanet = (
     planetName: PlanetName,
     sign: Sign
-  ): string | null => {
+  ): string => {
     return `${planetName} has entered ${Sign[sign]}!`
+  }
+
+  public getFormattedMessageForRetrograde = (
+    planetName: PlanetName,
+    sign: Sign,
+    isRetrograde: boolean
+  ): string => {
+    return `${planetName} has ${
+      isRetrograde ? 'entered' : 'left'
+    } retrograde in ${Sign[sign]}!`
   }
 
   public getFormattedMessageForAspect = (
@@ -190,7 +214,7 @@ export class DiscordBot {
       planetName !== 'Moon' &&
       planetName2 !== 'Moon'
     ) {
-      return `${planetName2} Cazimi in ${sign}!`
+      return `${planetName2} Cazimi in ${Sign[sign]}!`
     }
 
     if (
@@ -229,8 +253,6 @@ export class DiscordBot {
 
     changedPlanets.forEach(async ({ name, sign }) => {
       const message = this.getFormattedMessageForPlanet(name, sign)
-
-      if (!message) return
 
       await this.sendMessageToChannels(message)
     })
