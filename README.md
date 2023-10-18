@@ -14,7 +14,7 @@ Don't be shy! Feel free to [submit them publicly on my GitHub repo](https://gith
 
 ### Upcoming features
 
-1. Announcing Retrogrades, planets entering and leaving shadow, Mercury / Venus retrograde cazimis.
+/
 
 ## Production environment setup
 
