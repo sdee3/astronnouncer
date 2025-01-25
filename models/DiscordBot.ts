@@ -40,9 +40,18 @@ export class DiscordBot {
         (c) => c?.name === 'general'
       )?.id
 
-      if (!generalChannelId) return
+      if (generalChannelId) {
+        this.channelList.push(generalChannelId)
+      }
 
-      this.channelList.push(generalChannelId)
+      // Check for dedicated #announcements on Cam's server
+      const dedicatedAnnouncementsChannel = guildChannels?.find(
+        (c) => c?.name === 'astronouncements'
+      )?.id
+
+      if (dedicatedAnnouncementsChannel) {
+        this.channelList.push(dedicatedAnnouncementsChannel)
+      }
     })
 
     this.client.on(Events.GuildDelete, async (guild) => {
