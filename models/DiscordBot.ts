@@ -44,7 +44,7 @@ export class DiscordBot {
         this.channelList.push(generalChannelId)
       }
 
-      // Check for dedicated #announcements on Cam's server
+      // Check for dedicated #astronouncements on Cam's server
       const dedicatedAnnouncementsChannel = guildChannels?.find(
         (c) => c?.name === 'astronouncements'
       )?.id
@@ -63,11 +63,17 @@ export class DiscordBot {
 
       if (!generalChannelId) return
 
-      this.channelList = this.channelList.filter((c) => c !== generalChannelId)
+      const dedicatedAnnouncementsChannel = guildChannels?.find(
+        (c) => c?.name === 'astronouncements'
+      )?.id
+
+      this.channelList = this.channelList.filter(
+        (c) => c !== generalChannelId || c !== dedicatedAnnouncementsChannel
+      )
     })
 
     this.client.on(Events.ClientReady, async () => {
-      console.info('Bot is ready!')
+      console.info('Astronnouncer is ready!')
 
       this.fetchChannelsInterval = setInterval(
         async () => await this.fetchChannels(),
@@ -148,12 +154,21 @@ export class DiscordBot {
     const generalChannelId = guildChannels?.find(
       (c) => c?.name === 'general'
     )?.id
+    const astronouncementsChannelId = guildChannels?.find(
+      (c) => c?.name === 'astronouncements'
+    )?.id
 
     if (!generalChannelId) {
       return
     }
 
-    if (this.channelList.includes(generalChannelId)) {
+    if (
+      (this.channelList.includes(generalChannelId) &&
+        !astronouncementsChannelId) ||
+      (!!astronouncementsChannelId &&
+        this.channelList.includes(generalChannelId) &&
+        this.channelList.includes(astronouncementsChannelId))
+    ) {
       return
     }
 
@@ -179,6 +194,13 @@ export class DiscordBot {
 
     console.info('Adding channel from Discord server:', fetchedGuild.name)
     console.info('Channel added:', generalChannelId)
+
+    console.info('Checking if #astronouncements channel is present...')
+
+    if (astronouncementsChannelId) {
+      this.channelList.push(astronouncementsChannelId)
+      console.info('Channel added:', astronouncementsChannelId)
+    }
   }
 
   private clearInterval() {
