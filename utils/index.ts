@@ -57,6 +57,24 @@ export type PlanetName =
   | 'Neptune'
   | 'Pluto'
 
+export const PLANET_SPEED_ORDER: Record<PlanetName, number> = {
+  Moon: 0,
+  Mercury: 1,
+  Venus: 2,
+  Sun: 3,
+  Mars: 4,
+  Jupiter: 5,
+  Saturn: 6,
+  Uranus: 7,
+  Neptune: 8,
+  Pluto: 9
+}
+
+export const isFasterPlanetFirst = (
+  first: PlanetName,
+  second: PlanetName
+): boolean => PLANET_SPEED_ORDER[first] < PLANET_SPEED_ORDER[second]
+
 export enum Sign {
   'Aries' = 1,
   'Taurus' = 2,

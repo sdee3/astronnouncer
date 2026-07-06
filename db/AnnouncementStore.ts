@@ -2,8 +2,8 @@ import { DatabaseSync } from 'node:sqlite'
 import fs from 'fs'
 import path from 'path'
 import { AstroWatcher } from '../models/AstroWatcher'
-import { Aspect, PlanetName, Sign } from '../utils'
-import { aspectKey, retrogradeKey, signIngressKey } from './eventKeys'
+import { Aspect, PlanetName, Sign, isFasterPlanetFirst } from '../utils'
+import { aspectKey, retrogradeKey } from './eventKeys'
 import { SCHEMA } from './schema'
 
 const ASPECT_DEGREES: { aspect: Aspect; degreeDiff: number }[] = [
@@ -65,12 +65,6 @@ export class AnnouncementStore {
     )
 
     names.forEach((planet, index) => {
-      this.mark(signIngressKey(planet, signs[index]), 'sign_ingress', {
-        planet,
-        sign: signs[index],
-        bootstrap: true
-      })
-
       this.mark(
         retrogradeKey(planet, retrogrades[index], signs[index]),
         'retrograde',
@@ -111,7 +105,7 @@ export class AnnouncementStore {
       positions.forEach((position2, index2) => {
         const planetName2 = names[index2]
 
-        if (planetName >= planetName2) return
+        if (!isFasterPlanetFirst(planetName, planetName2)) return
 
         if (
           position.degrees === position2.degrees &&
@@ -124,7 +118,11 @@ export class AnnouncementStore {
               planetName2,
               signs[index],
               signs[index2],
-              'conjunction'
+              'conjunction',
+              position.degrees,
+              position.minutes,
+              position2.degrees,
+              position2.minutes
             ),
             'aspect',
             { bootstrap: true }
@@ -148,7 +146,7 @@ export class AnnouncementStore {
       positions.forEach((position2, index2) => {
         const planetName2 = names[index2]
 
-        if (planetName >= planetName2) return
+        if (!isFasterPlanetFirst(planetName, planetName2)) return
 
         const calculatedDegreeDiff = Math.abs(
           astroWatcher.normalizeDegrees(
@@ -167,7 +165,11 @@ export class AnnouncementStore {
               planetName2,
               signs[index],
               signs[index2],
-              aspect
+              aspect,
+              position.degrees,
+              position.minutes,
+              position2.degrees,
+              position2.minutes
             ),
             'aspect',
             { bootstrap: true }

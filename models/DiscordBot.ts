@@ -36,6 +36,9 @@ export class DiscordBot {
     })
 
     const aspectChecker = new AspectChecker(astroWatcher, this, store)
+    const { names, retrogrades } = astroWatcher.planets(new Date())
+
+    aspectChecker.seedRetrogradeStates(names, retrogrades)
 
     this.client.on(Events.GuildCreate, async (guild) => {
       const guildChannels = await guild.channels.fetch()
@@ -241,8 +244,13 @@ export class DiscordBot {
     planetName2: PlanetName,
     sign: Sign,
     sign2: Sign,
-    aspect: Aspect
+    aspect: Aspect,
+    planetRetrograde = false,
+    planet2Retrograde = false
   ): string | null => {
+    const formatPlanet = (name: PlanetName, planetSign: Sign, retrograde: boolean) =>
+      `${name}${retrograde ? ' retrograde' : ''} in ${Sign[planetSign]}`
+
     if (
       aspect === 'conjunction' &&
       (planetName === 'Sun' || planetName2 === 'Sun') &&
@@ -277,10 +285,10 @@ export class DiscordBot {
     }
 
     if (aspect === 'opposition') {
-      return `${planetName} in ${Sign[sign]} is making an ${aspect} to ${planetName2} in ${Sign[sign2]}!`
+      return `${formatPlanet(planetName, sign, planetRetrograde)} is making an ${aspect} to ${formatPlanet(planetName2, sign2, planet2Retrograde)}!`
     }
 
-    return `${planetName} in ${Sign[sign]} is making a ${aspect} to ${planetName2} in ${Sign[sign2]}!`
+    return `${formatPlanet(planetName, sign, planetRetrograde)} is making a ${aspect} to ${formatPlanet(planetName2, sign2, planet2Retrograde)}!`
   }
 
   private parsePlanetPositions = async () => {

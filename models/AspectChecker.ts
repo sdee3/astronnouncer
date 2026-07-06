@@ -1,17 +1,30 @@
 import { AnnouncementStore, aspectKey, retrogradeKey } from '../db'
 import { AstroWatcher } from './AstroWatcher'
 import { DiscordBot } from './DiscordBot'
-import { Aspect, PlanetName, Sign } from '../utils'
+import { Aspect, PlanetName, Sign, isFasterPlanetFirst } from '../utils'
 
 export class AspectChecker {
+  private readonly retrogradeState = new Map<PlanetName, boolean>()
+
   constructor(
     private readonly astroWatcher: AstroWatcher,
     private readonly discordBot: DiscordBot,
     private readonly store: AnnouncementStore
   ) {}
 
+  public seedRetrogradeStates = (
+    names: PlanetName[],
+    retrogrades: boolean[]
+  ): void => {
+    names.forEach((planet, index) => {
+      this.retrogradeState.set(planet, retrogrades[index])
+    })
+  }
+
   public checkForConjunction = async () => {
-    const { positions, names, signs } = this.astroWatcher.planets(new Date())
+    const { positions, names, signs, retrogrades } = this.astroWatcher.planets(
+      new Date()
+    )
 
     positions.forEach(async (position, index) => {
       const planetName = names[index]
@@ -19,7 +32,7 @@ export class AspectChecker {
       positions.forEach(async (position2, index2) => {
         const planetName2 = names[index2]
 
-        if (planetName === planetName2) return
+        if (!isFasterPlanetFirst(planetName, planetName2)) return
 
         if (
           position.degrees === position2.degrees &&
@@ -31,30 +44,26 @@ export class AspectChecker {
             planetName2,
             signs[index],
             signs[index2],
-            'conjunction'
+            'conjunction',
+            retrogrades[index],
+            retrogrades[index2]
           )
 
           if (!message) return
-
-          if (
-            this.hasAnnouncedAspect(
-              planetName,
-              planetName2,
-              signs[index],
-              signs[index2],
-              'conjunction'
-            )
-          ) {
-            return
-          }
 
           const key = aspectKey(
             planetName,
             planetName2,
             signs[index],
             signs[index2],
-            'conjunction'
+            'conjunction',
+            position.degrees,
+            position.minutes,
+            position2.degrees,
+            position2.minutes
           )
+
+          if (this.store.has(key)) return
 
           this.store.mark(key, 'aspect', {
             planetName1: planetName,
@@ -75,15 +84,28 @@ export class AspectChecker {
       const planetName = names[index]
       const sign = signs[index]
 
+      if (planetName === 'Sun' || planetName === 'Moon') return
+
+      const previousRetrograde = this.retrogradeState.get(planetName)
+
+      if (previousRetrograde === undefined) {
+        this.retrogradeState.set(planetName, retrograde)
+        return
+      }
+
+      if (previousRetrograde === retrograde) return
+
+      this.retrogradeState.set(planetName, retrograde)
+
+      const key = retrogradeKey(planetName, retrograde, sign)
+
+      if (this.store.has(key)) return
+
       const message = this.discordBot.getFormattedMessageForRetrograde(
         planetName,
         sign,
         retrograde
       )
-
-      if (this.hasAnnouncedRetrograde(planetName, retrograde, sign)) return
-
-      const key = retrogradeKey(planetName, retrograde, sign)
 
       this.store.mark(key, 'retrograde', {
         planetName,
@@ -96,7 +118,9 @@ export class AspectChecker {
   }
 
   public checkForAspect = async (aspect: Aspect, degreeDiff: number) => {
-    const { positions, names, signs } = this.astroWatcher.planets(new Date())
+    const { positions, names, signs, retrogrades } = this.astroWatcher.planets(
+      new Date()
+    )
 
     positions.forEach(async (position, index) => {
       const planetName = names[index]
@@ -104,7 +128,7 @@ export class AspectChecker {
       positions.forEach(async (position2, index2) => {
         const planetName2 = names[index2]
 
-        if (planetName === planetName2) return
+        if (!isFasterPlanetFirst(planetName, planetName2)) return
 
         const calculatedDegreeDiff = Math.abs(
           this.astroWatcher.normalizeDegrees(
@@ -122,30 +146,26 @@ export class AspectChecker {
             planetName2,
             signs[index],
             signs[index2],
-            aspect
+            aspect,
+            retrogrades[index],
+            retrogrades[index2]
           )
 
           if (!message) return
-
-          if (
-            this.hasAnnouncedAspect(
-              planetName,
-              planetName2,
-              signs[index],
-              signs[index2],
-              aspect
-            )
-          ) {
-            return
-          }
 
           const key = aspectKey(
             planetName,
             planetName2,
             signs[index],
             signs[index2],
-            aspect
+            aspect,
+            position.degrees,
+            position.minutes,
+            position2.degrees,
+            position2.minutes
           )
+
+          if (this.store.has(key)) return
 
           this.store.mark(key, 'aspect', {
             planetName1: planetName,
@@ -157,29 +177,5 @@ export class AspectChecker {
         }
       })
     })
-  }
-
-  private hasAnnouncedAspect = (
-    planetName1: PlanetName,
-    planetName2: PlanetName,
-    sign1: Sign,
-    sign2: Sign,
-    aspect: Aspect
-  ) => {
-    if (planetName2 === 'Moon') return true
-
-    return this.store.has(
-      aspectKey(planetName1, planetName2, sign1, sign2, aspect)
-    )
-  }
-
-  private hasAnnouncedRetrograde = (
-    planetName: PlanetName,
-    isRetrograde: boolean,
-    sign: Sign
-  ) => {
-    if (planetName === 'Sun' || planetName === 'Moon') return true
-
-    return this.store.has(retrogradeKey(planetName, isRetrograde, sign))
   }
 }
