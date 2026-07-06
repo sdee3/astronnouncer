@@ -15,23 +15,27 @@ import {
   MY_TEST_CHANNEL_ID,
   NODE_ENV
 } from '../config'
+import { AnnouncementStore, signIngressKey } from '../db'
 import { Aspect, PlanetName, Sign } from '../utils'
 
 export class DiscordBot {
-  private messageInterval: NodeJS.Timer | null = null
+  private messageInterval: NodeJS.Timeout | null = null
 
-  private fetchChannelsInterval: NodeJS.Timer | null = null
+  private fetchChannelsInterval: NodeJS.Timeout | null = null
 
   private channelList: string[] = []
 
   private client: Client | null = null
 
-  constructor(private readonly astroWatcher: AstroWatcher) {
+  constructor(
+    private readonly astroWatcher: AstroWatcher,
+    private readonly store: AnnouncementStore
+  ) {
     this.client = new Client({
       intents: [GatewayIntentBits.MessageContent]
     })
 
-    const aspectChecker = new AspectChecker(astroWatcher, this)
+    const aspectChecker = new AspectChecker(astroWatcher, this, store)
 
     this.client.on(Events.GuildCreate, async (guild) => {
       const guildChannels = await guild.channels.fetch()
@@ -283,7 +287,13 @@ export class DiscordBot {
     const changedPlanets = this.astroWatcher.getPlanetsWithChangedSigns()
 
     changedPlanets.forEach(async ({ name, sign }) => {
+      const key = signIngressKey(name, sign)
+
+      if (this.store.has(key)) return
+
       const message = this.getFormattedMessageForPlanet(name, sign)
+
+      this.store.mark(key, 'sign_ingress', { planet: name, sign })
 
       await this.sendMessageToChannels(message)
     })

@@ -1,0 +1,3 @@
+allowBuilds:
+  sweph: true
+  unrs-resolver: true

@@ -13,20 +13,22 @@
   "keywords": [],
   "author": "Stefan Djokic (stefd996@gmail.com)",
   "license": "ISC",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "dependencies": {
-    "dayjs": "^1.11.7",
-    "discord.js": "^14.9.0",
-    "dotenv": "^16.0.3",
-    "pm2": "^5.3.0",
-    "sweph": "2.10.3-2"
+    "discord.js": "^14.26.4",
+    "dotenv": "^17.4.2",
+    "pm2": "^7.0.3",
+    "sweph": "2.10.3-7"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.0",
-    "@types/node": "^18.15.11",
-    "jest": "^29.5.0",
-    "nodemon": "^2.0.22",
-    "ts-jest": "^29.1.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.3"
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.13.2",
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "ts-jest": "^29.4.11",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
   }
 }

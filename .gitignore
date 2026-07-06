@@ -4,3 +4,4 @@ node_modules
 .env.production
 fly.toml
 .DS_Store
+data/
