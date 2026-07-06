@@ -8,6 +8,7 @@
     "strict": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
+    "types": ["vitest/globals", "node"],
     "lib": ["ESNext"],
     "outDir": "./build"
   },
@@ -15,5 +16,5 @@
     "files": true
   },
   "include": ["*"],
-  "exclude": ["node_modules", "jest.config.ts", "**/*.spec.ts"]
+  "exclude": ["node_modules", "vitest.config.ts", "**/*.spec.ts"]
 }

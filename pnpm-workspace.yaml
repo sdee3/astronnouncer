@@ -1,3 +1,4 @@
 allowBuilds:
+  esbuild: true
   sweph: true
   unrs-resolver: true
