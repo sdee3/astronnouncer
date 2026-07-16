@@ -257,7 +257,8 @@ export class DiscordBot {
       planetName !== 'Moon' &&
       planetName2 !== 'Moon'
     ) {
-      return `${planetName2} Cazimi in ${Sign[sign]}!`
+      const cazimiPlanet = planetName === 'Sun' ? planetName2 : planetName
+      return `${cazimiPlanet} Cazimi in ${Sign[sign]}!`
     }
 
     if (
