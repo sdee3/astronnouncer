@@ -1,3 +1,6 @@
+# Supply-chain age floor: never install a version published less than 2 days
+# ago (minutes).
+minimumReleaseAge: 2880
 allowBuilds:
   esbuild: true
   sweph: true
